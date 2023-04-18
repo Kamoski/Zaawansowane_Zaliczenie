@@ -43,19 +43,22 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@aaf69d68aa3fb14c1d5a6be9ac61fe15b48453a2
-
-      - name: Build, tag, and push image to Amazon ECR
+        with:
+          registry-type: public
+        
+      - name: Build, tag, and push image to Amazon ECR Public
         id: build-image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+          REGISTRY_ALIAS: z3i4q8x2
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build a docker container and
           # push it to ECR so that it can
           # be deployed to ECS.
-          docker build -t public.ecr.aws/z3i4q8x2/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push public.ecr.aws/z3i4q8x2/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=public.ecr.aws/z3i4q8x2/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker build -t $ECR_REGISTRY/$REGISTRY_ALIAS/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$REGISTRY_ALIAS/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$REGISTRY_ALIAS/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
