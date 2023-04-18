@@ -1,0 +1,29 @@
+{
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "inferenceAccelerators": [],
+    "containerDefinitions": [
+        {
+            "name": "fargate-app",
+            "image": "public.ecr.aws/docker/library/httpd:latest",
+            "resourceRequirements": null,
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": "8080",
+                    "protocol": "tcp"
+                }
+                
+            ]
+        }
+    ],
+    "volumes": [],
+    "networkMode": "awsvpc",
+    "memory": "512",
+    "cpu": "256",
+    "executionRoleArn": "arn:aws:iam::305357645849:role/ecs-zaawansowany",
+    "family": "ecs-devops-sandbox-task-definition",
+    "taskRoleArn": "",
+    "placementConstraints": []
+}
