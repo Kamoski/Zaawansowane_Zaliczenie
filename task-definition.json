@@ -2,6 +2,16 @@
     "requiresCompatibilities": [
         "EC2"
     ],
+    "placementConstraints": [
+        {
+            "type": "memberOf",
+            "expression": "attribute:ecs.os-type == linux"
+        },
+        {
+            "type": "memberOf",
+            "expression": "attribute:ecs.instance-type == t2.micro"
+        }
+    ],
     "inferenceAccelerators": [],
     "containerDefinitions": [
         {
@@ -24,6 +34,5 @@
     "family": "ecs-devops-sandbox-task-definition",
     "taskRoleArn": "arn:aws:iam::305357645849:role/ecsInstanceRole",
     "memory": "512",
-    "cpu": "256",
-    "placementConstraints": []
+    "cpu": "256"
 }
