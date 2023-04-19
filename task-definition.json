@@ -30,7 +30,7 @@
         }
     ],
     "volumes": [],
-    "networkMode": "awsvpc",
+    "networkMode": "bridge",
     "executionRoleArn": "arn:aws:iam::305357645849:role/ecsTaskExecutionRole",
     "family": "ecs-devops-sandbox-task-definition",
     "taskRoleArn": "arn:aws:iam::305357645849:role/ecsTaskExecutionRole",
