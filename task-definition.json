@@ -20,10 +20,8 @@
     ],
     "volumes": [],
     "networkMode": "awsvpc",
-    "memory": "512",
-    "cpu": "256",
     "executionRoleArn": "arn:aws:iam::305357645849:role/ecsTaskExecutionRole",
     "family": "ecs-devops-sandbox-task-definition",
-    "taskRoleArn": "",
+    "taskRoleArn": "arn:aws:iam::305357645849:role/ecsInstanceRole",
     "placementConstraints": []
 }
