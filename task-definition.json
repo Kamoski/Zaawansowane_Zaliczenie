@@ -19,7 +19,7 @@
             "image": "public.ecr.aws/docker/library/httpd:latest",
             "resourceRequirements": null,
             "essential": true,
-            "enviroment": [                
+            "environment": [                
                 {
                     "name":"TMPDIR",
                     "value":"/tmp"
