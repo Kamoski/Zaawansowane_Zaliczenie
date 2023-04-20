@@ -38,7 +38,10 @@ async def receiveVideo(file: UploadFile, response: Response):
         response.headers["file-uuid"] = uuid
         files[uuid] = file
         asyncio.create_task(start_detection_process_video(uuid))
-        return{"Success!": "Video added and uuid attached!"}
+        return[
+            {"Success!": "Video added and uuid attached!"},
+            {"File localization:": f"{file.file.name}"}
+               ]
     return {"file_size": file.content_type}
 
 @app.get('/healthcheck', status_code=status.HTTP_200_OK)

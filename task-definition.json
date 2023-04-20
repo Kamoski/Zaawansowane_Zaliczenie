@@ -19,6 +19,12 @@
             "image": "public.ecr.aws/docker/library/httpd:latest",
             "resourceRequirements": null,
             "essential": true,
+            "enviroment": [                
+                {
+                    "name":"TMPDIR",
+                    "value":"/tmp"
+                } 
+            ],
             "portMappings": [
                 {
                     "containerPort": "8080",
