@@ -1,5 +1,8 @@
 fastapi
 uvicorn
 python-multipart
-pandas
 opencv-python-headless
+asyncio
+uuid
+typing
+os

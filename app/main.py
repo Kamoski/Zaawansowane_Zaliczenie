@@ -3,11 +3,11 @@ import uuid as uuid_pkg
 from uuid import UUID
 from fastapi import FastAPI, status, File, UploadFile, Response, BackgroundTasks
 import cv2
-import pandas as pd
-from pydantic import BaseModel
 from typing import Any, List
+import os
+import logging
 
-import uvicorn
+logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
 
 
 app = FastAPI()
@@ -35,12 +35,18 @@ async def receiveVideo(file: UploadFile, response: Response):
         asyncio.create_task(start_detection_process_image(uuid))
         return{"Success!": "Image added and uuid attached!"}
     if("video" in file.content_type):
+        logging.debug("Received video type file")
+        logging.debug(f"File infos; Localization: {file.file.name}, Name: {file.filename}, Size: {file.size}")
         response.headers["file-uuid"] = uuid
         files[uuid] = file
+        filename = os.path.join("/tmp", f"{uuid}.{file.filename.split('.')[-1]}")
+        with open(filename, "wb") as f:
+            f.write(file.file.read())
         asyncio.create_task(start_detection_process_video(uuid))
         return[
             {"Success!": "Video added and uuid attached!"},
-            {"File localization:": f"{file.file.name}"}
+            {"File localization:": f"{file.file.name}"},
+            {"File name:":f"{file.filename}"}
                ]
     return {"file_size": file.content_type}
 
@@ -81,13 +87,14 @@ async def get_latest_data(response: Response):
 async def start_detection_process_video(uuid):
     global iterator
     global processing
+    logging.debug("Start video detection function")
     processing = True
     iterator = iterator + 1
     datapoints_x = []
     datapoints_y = []
     video_capture = cv2.VideoCapture(files[uuid].file.name)
     while video_capture.isOpened():
-        print("Still processing...")
+        logging.debug("Started processing")
         frame_exists, frame = video_capture.read() 
         if frame_exists:
             loop = asyncio.get_event_loop()               
@@ -106,6 +113,7 @@ async def start_detection_process_video(uuid):
             datapoints_x.append(video_capture.get(cv2.CAP_PROP_POS_MSEC))
             datapoints_y.append(amount_of_smiles)
         else:
+            logging.debug("Can't open video file")
             break
     gathered_data[uuid] = {
         'counter': iterator,
@@ -150,6 +158,3 @@ async def start_detection_process_image(uuid):
             'failed' : 'sorry'
         }
     processing = False
-    
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
