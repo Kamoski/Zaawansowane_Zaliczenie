@@ -92,7 +92,7 @@ async def start_detection_process_video(uuid):
     iterator = iterator + 1
     datapoints_x = []
     datapoints_y = []
-    video_capture = cv2.VideoCapture(files[uuid].file.name)
+    video_capture = cv2.VideoCapture(f'/tmp/{uuid}.mp4')
     while video_capture.isOpened():
         logging.debug("Started processing")
         frame_exists, frame = video_capture.read() 
