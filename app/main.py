@@ -7,6 +7,8 @@ from typing import Any, List
 import os
 import logging
 
+import uvicorn
+
 logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
 
 
@@ -39,9 +41,10 @@ async def receiveVideo(file: UploadFile, response: Response):
         logging.debug(f"File infos; Localization: {file.file.name}, Name: {file.filename}, Size: {file.size}")
         response.headers["file-uuid"] = uuid
         files[uuid] = file
-        filename = os.path.join("/tmp", f"{uuid}.{file.filename.split('.')[-1]}")
-        with open(filename, "wb") as f:
-            f.write(file.file.read())
+        if os.name == 'posix':
+            filename = os.path.join("/tmp", f"{uuid}.{file.filename.split('.')[-1]}")
+            with open(filename, "wb") as f:
+                f.write(file.file.read())
         asyncio.create_task(start_detection_process_video(uuid))
         return[
             {"Success!": "Video added and uuid attached!"},
@@ -92,10 +95,22 @@ async def start_detection_process_video(uuid):
     iterator = iterator + 1
     datapoints_x = []
     datapoints_y = []
-    video_capture = cv2.VideoCapture(f'/tmp/{uuid}.mp4')
+    if os.name == 'nt':
+        video_capture = cv2.VideoCapture(files[uuid].file.name)
+    
+    if os.name == 'posix':    
+        video_capture = cv2.VideoCapture(f'/tmp/{uuid}.mp4')
+    
+    all_frames = 0
+    current_frame = 0
+    if video_capture.isOpened():
+        all_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    
     while video_capture.isOpened():
-        logging.debug("Started processing")
-        frame_exists, frame = video_capture.read() 
+        frame_exists, frame = video_capture.read()
+        done_percent = (current_frame/all_frames) * 100
+        formatted_percent = "{:.2f}".format(done_percent) 
+        logging.debug(f"Processing... Done in: {formatted_percent}")
         if frame_exists:
             loop = asyncio.get_event_loop()               
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -112,9 +127,11 @@ async def start_detection_process_video(uuid):
 
             datapoints_x.append(video_capture.get(cv2.CAP_PROP_POS_MSEC))
             datapoints_y.append(amount_of_smiles)
+            current_frame = current_frame + 1
         else:
             logging.debug("Can't open video file")
             break
+    logging.debug("Processing finished.")
     gathered_data[uuid] = {
         'counter': iterator,
         'x': datapoints_x,
@@ -158,3 +175,6 @@ async def start_detection_process_image(uuid):
             'failed' : 'sorry'
         }
     processing = False
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
