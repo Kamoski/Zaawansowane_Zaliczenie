@@ -35,7 +35,7 @@ async def receiveVideo(file: UploadFile, response: Response):
         response.headers["file-uuid"] = uuid
         files[uuid] = file
         asyncio.create_task(start_detection_process_image(uuid))
-        return{"Success!": "Image added and uuid attached!"}
+        return{"Success!": "Image added and uuid attached! Hurray!"}
     if("video" in file.content_type):
         logging.debug("Received video type file")
         logging.debug(f"File infos; Localization: {file.file.name}, Name: {file.filename}, Size: {file.size}")
