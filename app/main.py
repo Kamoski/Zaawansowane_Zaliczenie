@@ -47,7 +47,7 @@ async def receiveVideo(file: UploadFile, response: Response):
                 f.write(file.file.read())
         asyncio.create_task(start_detection_process_video(uuid))
         return[
-            {"Success!": "Video added and uuid attached!"},
+            {"Success!": "Video added and uuid attached! Hurray!"},
             {"File localization:": f"{file.file.name}"},
             {"File name:":f"{file.filename}"}
                ]
